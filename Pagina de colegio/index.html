@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U.E.M. Francisco Febres Cordero - Portal Web & Gamificación</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            febres: {
+              50: '#f0f6ff',
+              100: '#e0edff',
+              200: '#bae0ff',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1d4ed8',
+              800: '#1e3a8a',
+              900: '#0a2540', // Azul Marino Institucional Principal
+              950: '#061729',
+            },
+            gold: {
+              300: '#fde047',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #061729;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a8a;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2563eb;
+    }
+    .glass-panel {
+      background: rgba(10, 37, 64, 0.75);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .glass-card {
+      background: rgba(6, 23, 41, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .gold-glow {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+    }
+    .blue-glow {
+      box-shadow: 0 0 25px rgba(37, 99, 235, 0.25);
+    }
+    .crest-shadow {
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.3));
+    }
+    .nav-active {
+      background-color: #1d4ed8;
+      color: #ffffff !important;
+      border-bottom: 2px solid #fbbf24;
+    }
+  </style>
+</head>
+<body class="h-full text-slate-100 font-sans antialiased bg-slate-950 flex flex-col min-h-screen selection:bg-febres-500 selection:text-white">
+
+  <!-- ENCABEZADO INSTITUCIONAL PRINCIPAL -->
+  <header class="bg-gradient-to-r from-febres-950 via-febres-900 to-slate-900 border-b border-amber-500/30 sticky top-0 z-40 shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-3">
+        
+        <!-- Identidad con Escudo -->
+        <div class="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-start">
+          <div class="flex items-center gap-3">
+            <img src="image_29c0a8.png" alt="Escudo Febres Cordero" class="w-12 h-12 sm:w-14 sm:h-14 object-contain crest-shadow hover:scale-105 transition duration-300">
+            <div>
+              <h1 class="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2 leading-tight">
+                U.E.M. FRANCISCO FEBRES CORDERO
+              </h1>
+              <p class="text-xs text-amber-400 font-semibold tracking-wide flex items-center gap-1.5">
+                <i class="fa-solid fa-graduation-cap text-sky-400"></i> Portal Web Institucional & Gamificación
+              </p>
+            </div>
+          </div>
+
+          <!-- Botón Menú Móvil -->
+          <button onclick="toggleMobileNav()" class="lg:hidden p-2 text-amber-400 hover:text-white">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Perfil Gamificado & Acceso de Usuario -->
+        <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+          
+          <!-- Puntos y Nivel Rápidos -->
+          <div id="quickStatsHeader" class="flex items-center gap-3 bg-slate-900/90 border border-amber-500/30 px-3 py-1.5 rounded-xl text-xs shadow-inner">
+            <div class="flex items-center gap-1.5" title="Monedas Febres">
+              <i class="fa-solid fa-coins text-amber-400"></i>
+              <span id="headerCoins" class="font-extrabold text-amber-300">250</span>
+            </div>
+            <div class="h-3.5 w-[1px] bg-slate-700"></div>
+            <div class="flex items-center gap-1.5" title="Nivel de Estudiante">
+              <i class="fa-solid fa-bolt text-sky-400"></i>
+              <span id="headerLevel" class="font-extrabold text-sky-200">Nv. 4</span>
+            </div>
+          </div>
+
+          <!-- Selector de Rol -->
+          <div class="hidden sm:flex items-center bg-slate-900 p-1 rounded-xl border border-blue-500/30 text-xs">
+            <button id="btnRoleStudent" onclick="setRole('student')" class="px-2.5 py-1 rounded-lg font-bold bg-febres-700 text-white shadow">
+              <i class="fa-solid fa-user-graduate mr-1"></i> Estudiante
+            </button>
+            <button id="btnRoleTeacher" onclick="setRole('teacher')" class="px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white">
+              <i class="fa-solid fa-chalkboard-user mr-1"></i> Docente
+            </button>
+          </div>
+
+          <!-- Avatar del Estudiante -->
+          <div class="flex items-center gap-2 border-l border-slate-800 pl-3">
+            <img id="userAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Mateo" alt="Avatar" class="w-9 h-9 rounded-full border-2 border-amber-400 bg-febres-900 p-0.5 shadow">
+            <div class="text-left hidden xl:block">
+              <div id="userName" class="text-xs font-extrabold text-white leading-tight">Mateo Silva V.</div>
+              <div id="userRoleBadge" class="text-[10px] font-semibold text-amber-400">10mo Año "A"</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- MENÚ DE NAVEGACIÓN INSTITUCIONAL -->
+      <nav id="mainNav" class="mt-3 pt-2 border-t border-slate-800 flex flex-wrap lg:flex-nowrap gap-1 text-xs sm:text-sm font-semibold justify-center lg:justify-start">
+        <button onclick="showSection('secInicio')" id="navInicio" class="nav-item nav-active px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-house text-amber-400"></i> Inicio
+        </button>
+        <button onclick="showSection('secNoticias')" id="navNoticias" class="nav-item px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-newspaper text-sky-400"></i> Noticias & Eventos
+        </button>
+
+        <button onclick="showSection('secMatriculas')" id="navMatriculas" class="nav-item px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-id-card text-emerald-400"></i> Matrículas
+        </button>
+        <button onclick="showSection('secHorarios')" id="navHorarios" class="nav-item px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-calendar-days text-purple-400"></i> Horarios
+        </button>
+        <button onclick="showSection('secGamificacion')" id="navGamificacion" class="nav-item px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-gamepad text-amber-400"></i> Aula Virtual & Gamificación
+        </button>
+        <button onclick="showSection('secDocentes')" id="navDocentes" class="nav-item px-3.5 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-febres-800 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-users text-blue-400"></i> Docentes & Contacto
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full flex flex-col gap-6">
+
+    <!-- 1. SECCIÓN: INICIO Y BIENVENIDA -->
+    <section id="secInicio" class="main-section space-y-6">
+      
+      <!-- HERO BANNER INSTITUCIONAL -->
+      <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-amber-500/30 blue-glow relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div class="space-y-3 z-10 lg:w-2/3">
+          <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-full border border-amber-500/30 uppercase tracking-wider inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-star"></i> Educación con Excelencia y Gamificación
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+            Bienvenidos a la Unidad Educativa Municipal <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-amber-300 to-amber-500">Francisco Febres Cordero</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Formamos líderes con valores, innovación tecnológica y ciencia. Accede a las matrículas, horarios de clase y participa en el portal escolar gamificado completando misiones y acumulando logros.
+          </p>
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="showSection('secGamificacion')" class="px-5 py-2.5 bg-febres-700 hover:bg-febres-600 text-white font-extrabold text-xs sm:text-sm rounded-xl border border-sky-400/40 shadow-lg flex items-center gap-2">
+              <i class="fa-solid fa-gamepad"></i> Ir al Aula Virtual Gamificada
+            </button>
+            <button onclick="showSection('secMatriculas')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm rounded-xl shadow-lg flex items-center gap-2">
+              <i class="fa-solid fa-user-plus"></i> Proceso de Matrícula 2026-2027
+            </button>
+          </div>
+        </div>
+
+        <!-- Escudo Destacado con Sombra -->
+        <div class="shrink-0 z-10 flex flex-col items-center">
+          <img src="image_29c0a8.png" alt="Escudo Oficial Febres Cordero" class="w-36 h-36 sm:w-48 sm:h-48 object-contain crest-shadow hover:scale-105 transition duration-500">
+          <span class="text-xs font-bold text-amber-400 mt-2">Fundado en Cuenca - Ecuador</span>
+        </div>
+      </div>
+
+      <!-- RESUMEN DE NOTICIAS Y EVENTOS DESTACADOS EN INICIO -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Comunicados Recientes -->
+        <div class="lg:col-span-2 glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="font-extrabold text-white text-base flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn text-amber-400"></i> Anuncios Institucionales Recientes
+            </h3>
+            <button onclick="showSection('secNoticias')" class="text-xs text-sky-400 font-bold hover:underline">Ver Todos</button>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3.5 rounded-xl bg-slate-950/70 border border-blue-500/20 flex gap-3 items-start">
+              <div class="p-2.5 bg-febres-800 text-amber-400 rounded-xl text-lg shrink-0">
+                <i class="fa-solid fa-calendar-check"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-sky-400 uppercase">10 de Octubre, 2026</span>
+                <h4 class="font-extrabold text-sm text-white">Minuto Cívico y Juramento a la Bandera</h4>
+                <p class="text-xs text-slate-400 mt-0.5">Se convoca a los estudiantes de 3ro de Bachillerato y representantes al patio central a las 07:30 AM.</p>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-950/70 border border-amber-500/20 flex gap-3 items-start">
+              <div class="p-2.5 bg-amber-500/20 text-amber-400 rounded-xl text-lg shrink-0">
+                <i class="fa-solid fa-file-pen"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-amber-400 uppercase">Proceso Abierto</span>
+                <h4 class="font-extrabold text-sm text-white">Inscripciones y Matrículas Ordinarias</h4>
+                <p class="text-xs text-slate-400 mt-0.5">Ya está disponible el módulo digital de solicitud de cupos para Octavo EGB y Primer Año de Bachillerato.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENDA ESCOLAR RÁPIDA -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+          <h3 class="font-extrabold text-white text-base flex items-center gap-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-calendar-days text-sky-400"></i> Próximas Fechas Clave
+          </h3>
+          
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <div>
+                <div class="font-bold text-white">Exámenes Parciales Q1</div>
+                <div class="text-[10px] text-slate-400">Todas las Asignaturas</div>
+              </div>
+              <span class="px-2 py-1 bg-febres-800 text-sky-300 font-bold rounded-md">15-19 Oct</span>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <div>
+                <div class="font-bold text-white">Feria de Ciencia & Gamificación</div>
+                <div class="text-[10px] text-slate-400">Presentación de Proyectos</div>
+              </div>
+              <span class="px-2 py-1 bg-amber-500/20 text-amber-300 font-bold rounded-md">28 Oct</span>
+            </div>
+
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 flex justify-between items-center">
+              <div>
+                <div class="font-bold text-white">Reunión de Padres de Familia</div>
+                <div class="text-[10px] text-slate-400">Entrega de Reportes parciales</div>
+              </div>
+              <span class="px-2 py-1 bg-emerald-500/20 text-emerald-300 font-bold rounded-md">05 Nov</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. SECCIÓN: NOTICIAS Y EVENTOS INSTITUCIONALES -->
+    <section id="secNoticias" class="main-section hidden space-y-6">
+      <div>
+        <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <i class="fa-solid fa-newspaper text-sky-400"></i> Noticias, Eventos y Comunicados
+        </h3>
+        <p class="text-xs text-slate-400">Mantente al día con las actividades oficiales de la Unidad Educativa Francisco Febres Cordero.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-300 text-[10px] font-bold uppercase">Académico</span>
+            <h4 class="font-extrabold text-base text-white">Inauguración del Año Lectivo y Nuevos Laboratorios</h4>
+            <p class="text-xs text-slate-300">Con presencia de autoridades municipales se realizó la apertura oficial de las aulas equipadas para el club de robótica y gamificación.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+            <span><i class="fa-regular fa-clock"></i> Hace 2 días</span>
+            <span class="font-bold text-amber-400">Secretaría Febres</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 text-[10px] font-bold uppercase">Deportes</span>
+            <h4 class="font-extrabold text-base text-white">Campeonato Interescolar de Fútbol y Baloncesto</h4>
+            <p class="text-xs text-slate-300">Las selecciones del colegio representarán a la institución en el torneo intercolegial. ¡Apoya a los leones de Febres!</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+            <span><i class="fa-regular fa-clock"></i> Hace 4 días</span>
+            <span class="font-bold text-amber-400">Club Deportivo</span>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase">Cultura</span>
+            <h4 class="font-extrabold text-base text-white">Taller de Oratoria y Concurso de Declamación</h4>
+            <p class="text-xs text-slate-300">Inscripciones abiertas para estudiantes de 8vo a 3ro de Bachillerato. Suma 150 Puntos XP en el portal al participar.</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+            <span><i class="fa-regular fa-clock"></i> Hace 1 semana</span>
+            <span class="font-bold text-amber-400">Área de Lengua</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SECCIÓN: MATRÍCULAS E INSCRIPCIONES -->
+    <section id="secMatriculas" class="main-section hidden space-y-6">
+      <div>
+        <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <i class="fa-solid fa-id-card text-emerald-400"></i> Proceso de Matrículas e Inscripciones
+        </h3>
+        <p class="text-xs text-slate-400">Formulario oficial de registro para alumnos nuevos y reinscripciones escolares.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- FORMULARIO DE MATRÍCULA -->
+        <div class="lg:col-span-8 glass-panel rounded-2xl p-6 border border-emerald-500/30 space-y-4">
+          <h4 class="font-extrabold text-base text-emerald-300 flex items-center gap-2 border-b border-slate-800 pb-3">
+            <i class="fa-solid fa-wpforms"></i> Solicitud de Inscripción / Matrícula 2026-2027
+          </h4>
+
+          <form id="formMatricula" onsubmit="handleMatricula(event)" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Nombres del Estudiante *</label>
+                <input type="text" required placeholder="Ej. Mateo Nicolás" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Apellidos del Estudiante *</label>
+                <input type="text" required placeholder="Ej. Silva Villacís" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Cédula de Identidad *</label>
+                <input type="text" required placeholder="0102030405" maxlength="10" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Nivel Educativo a Matricular *</label>
+                <select class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+                  <option>8vo Año EGB</option>
+                  <option>9no Año EGB</option>
+                  <option selected>10mo Año EGB</option>
+                  <option>1ro Bachillerato General</option>
+                  <option>2do Bachillerato General</option>
+                  <option>3ro Bachillerato General</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Jornada *</label>
+                <select class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+                  <option>Matutina</option>
+                  <option>Vespertina</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Nombre del Representante Legal *</label>
+                <input type="text" required placeholder="Ej. Carlos Silva" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-300 mb-1">Correo Electrónico del Representante *</label>
+                <input type="email" required placeholder="representante@gmail.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-emerald-400 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button type="submit" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs sm:text-sm shadow-lg flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud de Matrícula
+              </button>
+            </div>
+          </form>
+
+          <!-- Banner de respuesta -->
+          <div id="matriculaSuccessAlert" class="hidden p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-3">
+            <i class="fa-solid fa-circle-check text-2xl text-emerald-400"></i>
+            <div>
+              <span class="font-bold block">¡Solicitud Registrada con Éxito!</span>
+              Se ha generado el comprobante temporal #FEBRES-2026-884. Revisa el correo del representante para la confirmación.
+            </div>
+          </div>
+        </div>
+
+        <!-- REQUISITOS Y TRÁMITE -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-3">
+            <h4 class="font-extrabold text-white text-sm flex items-center gap-2 border-b border-slate-800 pb-2">
+              <i class="fa-solid fa-list-check text-amber-400"></i> Requisitos Digitales
+            </h4>
+            <ul class="text-xs text-slate-300 space-y-2">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Copia de Cédula del Estudiante</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Copia de Cédula del Representante</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Certificado de Promoción del Año Anterior</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-400"></i> Planilla de servicio básico (Luz/Agua)</li>
+            </ul>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 border border-blue-500/30 space-y-3">
+            <h4 class="font-extrabold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass text-sky-400"></i> Consultar Estado de Trámite
+            </h4>
+            <div class="space-y-2">
+              <input type="text" placeholder="Ingrese N° de Cédula" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white">
+              <button onclick="checkStatusMatricula()" class="w-full py-2 bg-febres-700 hover:bg-febres-600 text-white font-bold text-xs rounded-xl border border-sky-400/30">
+                Consultar Estado
+              </button>
+            </div>
+            <p id="statusResultText" class="text-[11px] text-slate-400 italic mt-1"></p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. SECCIÓN: HORARIOS DE CLASE INTERACTIVOS -->
+    <section id="secHorarios" class="main-section hidden space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-days text-purple-400"></i> Horario Semanal de Clases
+          </h3>
+          <p class="text-xs text-slate-400">Consulta la distribución de períodos y asignaturas por grado y paralelo.</p>
+        </div>
+
+        <!-- Selector de Grado -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-300">Curso:</label>
+          <select id="selectGradeHorario" onchange="updateHorarioTable()" class="bg-slate-900 border border-purple-500/30 rounded-xl px-3 py-2 text-xs font-bold text-purple-300 focus:outline-none">
+            <option value="10moA">10mo EGB - Paralelo "A"</option>
+            <option value="10moB">10mo EGB - Paralelo "B"</option>
+            <option value="1roBGU">1ro Bachillerato "A"</option>
+            <option value="2doBGU">2do Bachillerato "A"</option>
+            <option value="3roBGU">3ro Bachillerato "A"</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabla de Horario -->
+      <div class="glass-panel rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-febres-950 text-amber-300 border-b border-purple-500/20 font-extrabold">
+              <tr>
+                <th class="px-4 py-3.5 border-r border-slate-800/80 text-center">Hora / Período</th>
+                <th class="px-4 py-3.5">Lunes</th>
+                <th class="px-4 py-3.5">Martes</th>
+                <th class="px-4 py-3.5">Miércoles</th>
+                <th class="px-4 py-3.5">Jueves</th>
+                <th class="px-4 py-3.5">Viernes</th>
+              </tr>
+            </thead>
+            <tbody id="horarioTableBody" class="divide-y divide-slate-800/60 font-semibold">
+              <!-- Renderizado vía JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECCIÓN: AULA VIRTUAL & GAMIFICACIÓN ESCOLAR -->
+    <section id="secGamificacion" class="main-section hidden space-y-6">
+      
+      <!-- BANNER DOCENTE (SI ESTÁ ACTIVADO) -->
+      <div id="teacherBanner" class="hidden bg-gradient-to-r from-amber-950/90 via-febres-900 to-slate-900 border border-amber-500/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/40">
+            <i class="fa-solid fa-user-shield text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="font-extrabold text-amber-200 text-sm">Modo Docente / Tutor Activado</h2>
+            <p class="text-xs text-slate-300">Asigna tareas escolares, otorga XP por participación y administra reconocimientos.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openModal('modalNewTask')" class="px-4 py-2 bg-febres-700 hover:bg-febres-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 border border-blue-400/30">
+            <i class="fa-solid fa-plus"></i> Asignar Tarea
+          </button>
+          <button onclick="openModal('modalGiveXP')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-bold transition flex items-center gap-2">
+            <i class="fa-solid fa-award"></i> Otorgar Puntos
+          </button>
+        </div>
+      </div>
+
+      <!-- RESUMEN DEL ESTUDIANTE -->
+      <div id="studentProfileCard" class="glass-panel rounded-2xl p-6 relative overflow-hidden blue-glow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <div class="lg:col-span-4 flex items-center gap-4 border-b lg:border-b-0 lg:border-r border-blue-500/20 pb-4 lg:pb-0 lg:pr-6">
+            <div class="relative">
+              <img id="profileBigAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Mateo" class="w-20 h-20 rounded-2xl bg-febres-950 border-2 border-amber-400 p-1 shadow-lg">
+              <span class="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded-full border border-amber-300 shadow">
+                Nv. <span id="studentLevel">4</span>
+              </span>
+            </div>
+            <div>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1">
+                <i class="fa-solid fa-crown text-xs"></i> <span id="studentRankTitle">Caballero de Febres</span>
+              </span>
+              <h2 id="studentFullName" class="text-2xl font-black text-white">Mateo Silva V.</h2>
+              <p class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                <i class="fa-solid fa-school text-febres-500"></i> 10mo Año EGB - Paralelo "A"
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 flex flex-col justify-center gap-3">
+            <div class="flex items-center justify-between text-xs font-bold">
+              <span class="text-sky-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-star text-amber-400"></i> Progreso hacia Nivel <span id="nextLevelNum">5</span>
+              </span>
+              <span class="text-slate-300"><span id="currentXP">850</span> / <span id="maxXP">1000</span> XP</span>
+            </div>
+            
+            <div class="w-full h-4 bg-slate-950 rounded-full p-0.5 border border-blue-500/30 relative overflow-hidden shadow-inner">
+              <div id="xpProgressBar" class="h-full bg-gradient-to-r from-febres-700 via-sky-400 to-amber-400 rounded-full transition-all duration-700" style="width: 85%;"></div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mt-1">
+              <div class="bg-slate-950/70 border border-blue-500/20 rounded-xl p-2 text-center">
+                <span class="text-[10px] text-slate-400 block font-semibold">Monedas Febres</span>
+                <span id="statCoins" class="text-sm sm:text-base font-extrabold text-amber-400 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-coins text-xs"></i> 250
+                </span>
+              </div>
+              <div class="bg-slate-950/70 border border-blue-500/20 rounded-xl p-2 text-center">
+                <span class="text-[10px] text-slate-400 block font-semibold">Tareas Entregadas</span>
+                <span id="statTasks" class="text-sm sm:text-base font-extrabold text-sky-400 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-circle-check text-xs"></i> 12
+                </span>
+              </div>
+              <div class="bg-slate-950/70 border border-blue-500/20 rounded-xl p-2 text-center">
+                <span class="text-[10px] text-slate-400 block font-semibold">Insignias</span>
+                <span id="statBadges" class="text-sm sm:text-base font-extrabold text-amber-300 flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-shield-halved text-xs"></i> 6/12
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- PESTAÑAS DE GAMIFICACIÓN -->
+      <nav class="flex overflow-x-auto gap-2 border-b border-blue-900/50 pb-2">
+        <button onclick="switchGamTab('tabMisiones')" id="tabBtnMisiones" class="gam-tab-btn active px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-febres-800 text-white border border-amber-400/40 shadow">
+          <i class="fa-solid fa-list-check text-amber-400"></i> Tareas & Misiones
+        </button>
+        <button onclick="switchGamTab('tabSkillTree')" id="tabBtnSkillTree" class="gam-tab-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 transition">
+          <i class="fa-solid fa-sitemap text-sky-400"></i> Mapa de Módulos
+        </button>
+        <button onclick="switchGamTab('tabInsignias')" id="tabBtnInsignias" class="gam-tab-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 transition">
+          <i class="fa-solid fa-award text-amber-400"></i> Insignias
+        </button>
+        <button onclick="switchGamTab('tabLeaderboard')" id="tabBtnLeaderboard" class="gam-tab-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 transition">
+          <i class="fa-solid fa-trophy text-amber-400"></i> Tabla de Honor
+        </button>
+        <button onclick="switchGamTab('tabTienda')" id="tabBtnTienda" class="gam-tab-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800 transition">
+          <i class="fa-solid fa-store text-emerald-400"></i> Febres Store
+        </button>
+      </nav>
+
+      <!-- TAB 1: TAREAS ESCOLARES -->
+      <div id="tabMisiones" class="gam-tab-content space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-scroll text-amber-400"></i> Tareas Escolares Activas
+            </h4>
+            <p class="text-xs text-slate-400">Completa tus deberes asignados para ganar Puntos XP y Monedas Febres.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 text-xs">
+            <button onclick="filterTasks('all')" class="px-3 py-1 rounded-lg bg-febres-700 text-white font-semibold">Todas</button>
+            <button onclick="filterTasks('Matemáticas')" class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-semibold">Matemáticas</button>
+            <button onclick="filterTasks('Lengua')" class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-semibold">Lengua</button>
+            <button onclick="filterTasks('Ciencias')" class="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-semibold">Ciencias</button>
+          </div>
+        </div>
+
+        <div id="tasksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado vía JS -->
+        </div>
+      </div>
+
+      <!-- TAB 2: ÁRBOL DE MÓDULOS -->
+      <div id="tabSkillTree" class="gam-tab-content hidden space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="glass-card rounded-2xl p-5 border border-blue-500/30 space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-600/30 text-sky-400 flex items-center justify-center border border-blue-500/40">
+                <i class="fa-solid fa-calculator text-lg"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white">Matemáticas</h4>
+                <span class="text-[10px] text-sky-400 font-semibold">Nivel 3 / 5</span>
+              </div>
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>1. Álgebra Básica</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>2. Ecuaciones 2do Grado</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-febres-900 border border-amber-500/40 text-amber-300 font-bold flex justify-between"><span>3. Geometría Analítica</span> <i class="fa-solid fa-spinner animate-spin"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950/50 text-slate-500 flex justify-between"><span>4. Trigonometría</span> <i class="fa-solid fa-lock"></i></div>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 border border-amber-500/30 space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/40">
+                <i class="fa-solid fa-book-open text-lg"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white">Lengua y Lit.</h4>
+                <span class="text-[10px] text-amber-400 font-semibold">Nivel 2 / 5</span>
+              </div>
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>1. Comprensión Lectora</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-febres-900 border border-amber-500/40 text-amber-300 font-bold flex justify-between"><span>2. Ensayo Argumentativo</span> <i class="fa-solid fa-spinner animate-spin"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950/50 text-slate-500 flex justify-between"><span>3. Literatura Ecuatoriana</span> <i class="fa-solid fa-lock"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950/50 text-slate-500 flex justify-between"><span>4. Oratoria y Debate</span> <i class="fa-solid fa-lock"></i></div>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 border border-emerald-500/30 space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+                <i class="fa-solid fa-flask text-lg"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white">Ciencias Nat.</h4>
+                <span class="text-[10px] text-emerald-400 font-semibold">Nivel 4 / 5</span>
+              </div>
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>1. Célula y Genética</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>2. Ecosistemas Nat.</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>3. Química Orgánica</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-febres-900 border border-amber-500/40 text-amber-300 font-bold flex justify-between"><span>4. Física Mecánica</span> <i class="fa-solid fa-spinner animate-spin"></i></div>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 border border-purple-500/30 space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/40">
+                <i class="fa-solid fa-landmark text-lg"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-white">Historia y Soc.</h4>
+                <span class="text-[10px] text-purple-400 font-semibold">Nivel 1 / 5</span>
+              </div>
+            </div>
+            <div class="space-y-1.5 text-xs">
+              <div class="p-2 rounded-lg bg-slate-950 border border-emerald-500/30 text-emerald-300 flex justify-between"><span>1. Culturas Ancestrales</span> <i class="fa-solid fa-check"></i></div>
+              <div class="p-2 rounded-lg bg-febres-900 border border-amber-500/40 text-amber-300 font-bold flex justify-between"><span>2. Independencia</span> <i class="fa-solid fa-spinner animate-spin"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950/50 text-slate-500 flex justify-between"><span>3. Siglo XX en Ecuador</span> <i class="fa-solid fa-lock"></i></div>
+              <div class="p-2 rounded-lg bg-slate-950/50 text-slate-500 flex justify-between"><span>4. Geografía Mundial</span> <i class="fa-solid fa-lock"></i></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: INSIGNIAS -->
+      <div id="tabInsignias" class="gam-tab-content hidden space-y-4">
+        <div id="badgesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <!-- Renderizado vía JS -->
+        </div>
+      </div>
+
+      <!-- TAB 4: TABLA DE HONOR -->
+      <div id="tabLeaderboard" class="gam-tab-content hidden space-y-4">
+        <div class="glass-panel rounded-2xl overflow-hidden border border-amber-500/30 shadow-2xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-febres-950 text-amber-300 uppercase border-b border-amber-500/20 font-bold">
+                <tr>
+                  <th class="px-6 py-3.5">Posición</th>
+                  <th class="px-6 py-3.5">Estudiante</th>
+                  <th class="px-6 py-3.5">Paralelo</th>
+                  <th class="px-6 py-3.5 text-center">Nivel</th>
+                  <th class="px-6 py-3.5 text-right">Puntos XP</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody" class="divide-y divide-slate-800/60 font-semibold">
+                <!-- Renderizado vía JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: FEBRES STORE -->
+      <div id="tabTienda" class="gam-tab-content hidden space-y-4">
+        <div class="flex items-center justify-between bg-gradient-to-r from-amber-950/60 via-febres-900 to-slate-900 p-4 rounded-2xl border border-amber-500/30">
+          <div>
+            <h4 class="text-base font-bold text-amber-300 flex items-center gap-2">
+              <i class="fa-solid fa-store text-amber-400"></i> Febres Store - Recompensas Escolars
+            </h4>
+            <p class="text-xs text-slate-300">Canjea tus Monedas Febres acumuladas por privilegios académicos reales.</p>
+          </div>
+          <div class="bg-amber-500/20 border border-amber-500/40 px-3.5 py-1.5 rounded-xl text-xs font-bold text-amber-300">
+            Saldo: <span id="storeUserCoins">250 Monedas</span>
+          </div>
+        </div>
+
+        <div id="storeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado vía JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 6. SECCIÓN: DOCENTES Y CONTACTO -->
+    <section id="secDocentes" class="main-section hidden space-y-6">
+      <div>
+        <h3 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <i class="fa-solid fa-users text-blue-400"></i> Planta Docente y Atención a Padres
+        </h3>
+        <p class="text-xs text-slate-400">Directorio de tutores de curso, profesores de asignatura y contacto institucional.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Directorio de Profesores -->
+        <div class="lg:col-span-7 space-y-4">
+          <h4 class="font-extrabold text-white text-sm flex items-center gap-2">
+            <i class="fa-solid fa-chalkboard-user text-amber-400"></i> Tutores y Profesores por Área
+          </h4>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prof1" class="w-12 h-12 rounded-xl bg-slate-950 border border-blue-400 p-1">
+              <div>
+                <h5 class="font-bold text-xs text-white">Lic. Fernando Cordero</h5>
+                <p class="text-[11px] text-amber-400">Matemáticas - Tutor 10mo "A"</p>
+                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> Atención: Jueves 10:00 AM</p>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prof2" class="w-12 h-12 rounded-xl bg-slate-950 border border-amber-400 p-1">
+              <div>
+                <h5 class="font-bold text-xs text-white">Dra. Mónica Andrade</h5>
+                <p class="text-[11px] text-amber-400">Lengua y Literatura</p>
+                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> Atención: Martes 09:00 AM</p>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prof3" class="w-12 h-12 rounded-xl bg-slate-950 border border-emerald-400 p-1">
+              <div>
+                <h5 class="font-bold text-xs text-white">Ing. Roberto Morales</h5>
+                <p class="text-[11px] text-amber-400">Ciencias Naturales & Robótica</p>
+                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> Atención: Viernes 11:30 AM</p>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Prof4" class="w-12 h-12 rounded-xl bg-slate-950 border border-purple-400 p-1">
+              <div>
+                <h5 class="font-bold text-xs text-white">Msc. Patricia Vega</h5>
+                <p class="text-[11px] text-amber-400">Historia y Ciencias Sociales</p>
+                <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> Atención: Lunes 08:00 AM</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Formulario de Contacto -->
+        <div class="lg:col-span-5 glass-panel rounded-2xl p-5 border border-blue-500/30 space-y-4">
+          <h4 class="font-extrabold text-white text-sm flex items-center gap-2 border-b border-slate-800 pb-2">
+            <i class="fa-solid fa-envelope text-sky-400"></i> Formulario de Atención a Padres
+          </h4>
+
+          <form onsubmit="handleContactSubmit(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Nombre Completo</label>
+              <input type="text" required placeholder="Tu nombre..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-sky-400">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Correo o Teléfono</label>
+              <input type="text" required placeholder="Contacto..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-sky-400">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-300 mb-1">Mensaje o Inquietud</label>
+              <textarea rows="3" required placeholder="Escribe tu consulta sobre tu representado..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white focus:outline-none focus:border-sky-400"></textarea>
+            </div>
+            <button type="submit" class="w-full py-2.5 bg-febres-700 hover:bg-febres-600 font-bold text-white rounded-xl shadow-md border border-sky-400/30">
+              Enviar Consulta
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA INSTITUCIONAL -->
+  <footer class="bg-febres-950 border-t border-amber-500/20 mt-12 py-6 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <img src="image_29c0a8.png" alt="Escudo Febres Cordero" class="w-6 h-6 object-contain">
+        <span class="font-bold text-slate-200">Unidad Educativa Municipal Francisco Febres Cordero</span> &copy; 2026
+      </div>
+      <p class="text-slate-400">"Virtud, Ciencia y Liderazgo para el Futuro"</p>
+    </div>
+  </footer>
+
+  <!-- MODAL CREAR NUEVA MISIÓN / TAREA ESCOLAR -->
+  <div id="modalNewTask" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-blue-500/30 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle text-sky-400"></i> Asignar Tarea Escolar
+        </h3>
+        <button onclick="closeModal('modalNewTask')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formNewTask" onsubmit="handleCreateTask(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Título de la Tarea</label>
+          <input type="text" id="inputTaskTitle" required placeholder="Ej. Taller de Lectura Crítica #4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Asignatura</label>
+            <select id="inputTaskSubject" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none">
+              <option value="Matemáticas">Matemáticas</option>
+              <option value="Lengua">Lengua y Lit.</option>
+              <option value="Ciencias">Ciencias Nat.</option>
+              <option value="Historia">Historia / Soc.</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Dificultad</label>
+            <select id="inputTaskDiff" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none">
+              <option value="Fácil">Fácil (+50 XP)</option>
+              <option value="Media">Media (+100 XP)</option>
+              <option value="Difícil">Difícil (+200 XP)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Recompensa XP</label>
+            <input type="number" id="inputTaskXP" value="100" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Monedas Febres</label>
+            <input type="number" id="inputTaskCoins" value="30" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Instrucciones Breves</label>
+          <textarea id="inputTaskDesc" rows="2" required placeholder="Descripción del deber para el estudiante..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-sky-400 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modalNewTask')" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 font-bold">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-febres-700 text-white font-bold border border-sky-400/30">Publicar Tarea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL OTORGAR PUNTOS -->
+  <div id="modalGiveXP" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full rounded-2xl p-6 border border-amber-500/30 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
+          <i class="fa-solid fa-gift text-amber-400"></i> Otorgar Puntos de Actitud / Participación
+        </h3>
+        <button onclick="closeModal('modalGiveXP')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form id="formGiveXP" onsubmit="handleGiveXP(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Seleccionar Estudiante</label>
+          <select id="selectStudent" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-amber-400 focus:outline-none">
+            <option value="Mateo Silva V.">Mateo Silva V. (10mo A)</option>
+            <option value="Camila Cordero">Camila Cordero (10mo A)</option>
+            <option value="Juan Delgado">Juan Delgado (10mo B)</option>
+            <option value="Sofia Morales">Sofia Morales (10mo A)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Motivo / Mérito</label>
+          <input type="text" id="giveReason" required placeholder="Ej. Excelente aporte en clase de Ciencias" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-amber-400 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Puntos XP</label>
+            <input type="number" id="giveXPNum" value="50" min="10" max="500" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-amber-400 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Monedas</label>
+            <input type="number" id="giveCoinsNum" value="20" min="5" max="200" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white focus:border-amber-400 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modalGiveXP')" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 font-bold">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-amber-500 text-slate-950 font-extrabold">Entregar Puntos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICACIÓN TOAST -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-febres-900 border border-amber-400 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+      <div id="toastIcon" class="text-xl text-amber-400">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h4 id="toastTitle" class="font-bold text-xs text-amber-300">¡Acción Realizada!</h4>
+        <p id="toastMessage" class="text-xs text-slate-200">Detalles de la notificación.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT DE LA APLICACIÓN -->
+  <script>
+    // Estado del estudiante
+    let userState = {
+      role: 'student',
+      name: 'Mateo Silva V.',
+      level: 4,
+      currentXP: 850,
+      maxXP: 1000,
+      coins: 250,
+      completedTasksCount: 12
+    };
+
+    const rankTitles = {
+      1: 'Aprendiz Febresiano',
+      2: 'Explorador del Saber',
+      3: 'Guardián de la Ciencia',
+      4: 'Caballero de Febres',
+      5: 'Maestro Ilustre',
+      6: 'Leyenda de la Academia'
+    };
+
+    // Datos de Horarios por Grado
+    const horariosData = {
+      '10moA': [
+        { period: '1 (07:15 - 08:00)', lun: 'Matemáticas', mar: 'Lengua', mie: 'Ciencias Nat.', jue: 'Inglés', vie: 'Educ. Física' },
+        { period: '2 (08:00 - 08:45)', lun: 'Matemáticas', mar: 'Lengua', mie: 'Ciencias Nat.', jue: 'Inglés', vie: 'Educ. Física' },
+        { period: 'RECREO (08:45)', lun: 'RECESO', mar: 'RECESO', mie: 'RECESO', jue: 'RECESO', vie: 'RECESO' },
+        { period: '3 (09:15 - 10:00)', lun: 'Historia', mar: 'Matemáticas', mie: 'Lengua', jue: 'Informática', vie: 'Ciencias Nat.' },
+        { period: '4 (10:00 - 10:45)', lun: 'Inglés', mar: 'Historia', mie: 'Artes', jue: 'Informática', vie: 'Matemáticas' },
+      ],
+      '10moB': [
+        { period: '1 (07:15 - 08:00)', lun: 'Lengua', mar: 'Matemáticas', mie: 'Inglés', jue: 'Ciencias Nat.', vie: 'Historia' },
+        { period: '2 (08:00 - 08:45)', lun: 'Lengua', mar: 'Matemáticas', mie: 'Inglés', jue: 'Ciencias Nat.', vie: 'Historia' },
+        { period: 'RECREO (08:45)', lun: 'RECESO', mar: 'RECESO', mie: 'RECESO', jue: 'RECESO', vie: 'RECESO' },
+        { period: '3 (09:15 - 10:00)', lun: 'Ciencias Nat.', mar: 'Educ. Física', mie: 'Matemáticas', jue: 'Lengua', vie: 'Informática' },
+      ]
+    };
+
+    // Tareas
+    let tasks = [
+      { id: 1, title: 'Ecuaciones Cuadráticas', subject: 'Matemáticas', diff: 'Media', xp: 120, coins: 35, desc: 'Resuelve el taller interactivo de la página 45.', completed: false, icon: 'fa-calculator', color: 'from-blue-600 to-febres-800' },
+      { id: 2, title: 'Ensayo de Valores Febresianos', subject: 'Lengua', diff: 'Difícil', xp: 200, coins: 50, desc: 'Redacta un ensayo sobre la virtud y liderazgo escolar.', completed: false, icon: 'fa-book-open', color: 'from-amber-600 to-amber-800' },
+      { id: 3, title: 'Informe de Biodiversidad', subject: 'Ciencias', diff: 'Fácil', xp: 80, coins: 20, desc: 'Presenta la ficha técnica sobre la flora nativa.', completed: true, icon: 'fa-flask', color: 'from-emerald-600 to-teal-800' },
+      { id: 4, title: 'Línea de Tiempo Histórica', subject: 'Historia', diff: 'Media', xp: 110, coins: 30, desc: 'Mapa mental sobre la Independencia.', completed: false, icon: 'fa-landmark', color: 'from-purple-600 to-slate-800' }
+    ];
+
+    // Insignias
+    const badges = [
+      { id: 1, name: 'Honor Febresiano', desc: 'Nota sobresaliente en 3 evaluaciones.', icon: 'fa-award', unlocked: true, color: 'text-amber-400' },
+      { id: 2, name: 'Pensador Matemático', desc: 'Resuelve 5 misiones de matemática.', icon: 'fa-square-root-variable', unlocked: true, color: 'text-sky-400' },
+      { id: 3, name: 'Escritor Destacado', desc: 'Entrega 3 ensayos impecables.', icon: 'fa-feather', unlocked: true, color: 'text-amber-300' },
+      { id: 4, name: 'Puntualidad Absoluta', desc: 'Sin atrasos en el quimestre.', icon: 'fa-clock', unlocked: true, color: 'text-yellow-300' },
+      { id: 5, name: 'Compañerismo Febres', desc: 'Suma de puntos por apoyo a compañeros.', icon: 'fa-hands-holding-child', unlocked: false, color: 'text-slate-600' }
+    ];
+
+    // Tabla de honor
+    let leaderboard = [
+      { pos: 1, name: 'Camila Cordero', course: '10mo "A"', level: 6, xp: 1450, avatar: 'Camila' },
+      { pos: 2, name: 'Mateo Silva V. (Tú)', course: '10mo "A"', level: 4, xp: 850, avatar: 'Mateo', isUser: true },
+      { pos: 3, name: 'Juan Delgado', course: '10mo "B"', level: 4, xp: 810, avatar: 'Juan' },
+      { pos: 4, name: 'Sofia Morales', course: '10mo "A"', level: 3, xp: 740, avatar: 'Sofia' }
+    ];
+
+    // Tienda
+    const storeItems = [
+      { id: 1, name: 'Punto Extra en Evaluación', cost: 300, icon: 'fa-file-circle-plus', color: 'text-amber-400', desc: '+1 Punto directo sobre la nota de un examen.' },
+      { id: 2, name: 'Día de Ropa Casual', cost: 200, icon: 'fa-shirt', color: 'text-sky-400', desc: 'Permiso para ropa casual el viernes autorizado.' },
+      { id: 3, name: 'Elección de Asiento', cost: 150, icon: 'fa-chair', color: 'text-emerald-400', desc: 'Escoge tu puesto en el aula por 1 semana.' }
+    ];
+
+    window.onload = function() {
+      updateHorarioTable();
+      renderGamificationAll();
+    };
+
+    function showSection(secId) {
+      document.querySelectorAll('.main-section').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('nav-active'));
+
+      document.getElementById(secId).classList.remove('hidden');
+      
+      const activeNav = document.getElementById('nav' + secId.replace('sec', ''));
+      if (activeNav) activeNav.classList.add('nav-active');
+    }
+
+    function updateHorarioTable() {
+      const selectedGrade = document.getElementById('selectGradeHorario').value;
+      const data = horariosData[selectedGrade] || horariosData['10moA'];
+      const tbody = document.getElementById('horarioTableBody');
+      tbody.innerHTML = '';
+
+      data.forEach(row => {
+        const isRecreo = row.lun === 'RECESO';
+        const tr = document.createElement('tr');
+        tr.className = isRecreo ? 'bg-amber-500/10 font-bold text-amber-300' : 'hover:bg-slate-900/50';
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 border-r border-slate-800/80 text-center font-bold text-sky-400">${row.period}</td>
+          <td class="px-4 py-3">${row.lun}</td>
+          <td class="px-4 py-3">${row.mar}</td>
+          <td class="px-4 py-3">${row.mie}</td>
+          <td class="px-4 py-3">${row.jue}</td>
+          <td class="px-4 py-3">${row.vie}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderGamificationAll() {
+      renderProfileStats();
+      renderTasks('all');
+      renderBadges();
+      renderLeaderboard();
+      renderStore();
+    }
+
+    function renderProfileStats() {
+      document.getElementById('headerCoins').innerText = userState.coins;
+      document.getElementById('headerLevel').innerText = `Nv. ${userState.level}`;
+      document.getElementById('studentLevel').innerText = userState.level;
+      document.getElementById('nextLevelNum').innerText = userState.level + 1;
+      document.getElementById('currentXP').innerText = userState.currentXP;
+      document.getElementById('maxXP').innerText = userState.maxXP;
+      document.getElementById('studentRankTitle').innerText = rankTitles[userState.level] || 'Líder Febresiano';
+
+      let pct = Math.min(100, Math.round((userState.currentXP / userState.maxXP) * 100));
+      document.getElementById('xpProgressBar').style.width = `${pct}%`;
+
+      document.getElementById('statCoins').innerHTML = `<i class="fa-solid fa-coins text-xs"></i> ${userState.coins}`;
+      document.getElementById('statTasks').innerHTML = `<i class="fa-solid fa-circle-check text-xs"></i> ${userState.completedTasksCount}`;
+      document.getElementById('storeUserCoins').innerText = `${userState.coins} Monedas`;
+
+      const userLb = leaderboard.find(i => i.isUser);
+      if (userLb) {
+        userLb.xp = userState.currentXP;
+        userLb.level = userState.level;
+      }
+    }
+
+    function renderTasks(filterSubject = 'all') {
+      const container = document.getElementById('tasksGrid');
+      container.innerHTML = '';
+
+      const filtered = filterSubject === 'all' ? tasks : tasks.filter(t => t.subject.toLowerCase().includes(filterSubject.toLowerCase()));
+
+      filtered.forEach(task => {
+        const card = document.createElement('div');
+        card.className = `glass-card rounded-2xl p-4 flex flex-col justify-between border ${task.completed ? 'opacity-75 border-emerald-500/30' : 'border-slate-800'}`;
+        
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-900 text-amber-300 border border-amber-500/20">${task.subject}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${task.diff === 'Fácil' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">${task.diff}</span>
+            </div>
+            <h4 class="font-bold text-sm text-white mb-1">${task.title}</h4>
+            <p class="text-xs text-slate-400 mb-3">${task.desc}</p>
+          </div>
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs font-bold text-sky-300">+${task.xp} XP</span>
+            ${task.completed ? 
+              `<span class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-check"></i> Entregada</span>` : 
+              `<button onclick="completeTask(${task.id})" class="px-3 py-1 bg-febres-700 hover:bg-febres-600 text-white font-bold text-xs rounded-lg">Entregar</button>`
+            }
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterTasks(sub) { renderTasks(sub); }
+
+    function completeTask(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task || task.completed) return;
+
+      task.completed = true;
+      userState.currentXP += task.xp;
+      userState.coins += task.coins;
+      userState.completedTasksCount++;
+
+      if (userState.currentXP >= userState.maxXP) {
+        userState.level++;
+        userState.currentXP -= userState.maxXP;
+        userState.maxXP = Math.round(userState.maxXP * 1.25);
+      }
+
+      renderGamificationAll();
+      showToast('¡Tarea Entregada!', `Ganaste +${task.xp} XP y +${task.coins} Monedas.`);
+      confetti({ particleCount: 60, spread: 60 });
+    }
+
+    function renderBadges() {
+      const container = document.getElementById('badgesGrid');
+      container.innerHTML = '';
+      badges.forEach(b => {
+        const card = document.createElement('div');
+        card.className = `glass-card rounded-2xl p-3 text-center border ${b.unlocked ? 'border-amber-400/40' : 'opacity-40 border-slate-800'}`;
+        card.innerHTML = `
+          <i class="fa-solid ${b.icon} text-2xl ${b.unlocked ? b.color : 'text-slate-600'} my-1"></i>
+          <h5 class="font-bold text-xs text-white">${b.name}</h5>
+          <p class="text-[10px] text-slate-400 mt-1">${b.desc}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboardBody');
+      container.innerHTML = '';
+      leaderboard.sort((a, b) => b.xp - a.xp);
+
+      leaderboard.forEach((item, idx) => {
+        const row = document.createElement('tr');
+        row.className = `border-b border-slate-800/40 ${item.isUser ? 'bg-febres-900/40 text-amber-300' : ''}`;
+        row.innerHTML = `
+          <td class="px-6 py-3 font-bold">#${idx + 1}</td>
+          <td class="px-6 py-3 font-bold text-white">${item.name}</td>
+          <td class="px-6 py-3 text-slate-400">${item.course}</td>
+          <td class="px-6 py-3 text-center font-bold text-sky-400">Nv. ${item.level}</td>
+          <td class="px-6 py-3 text-right font-extrabold text-amber-400">${item.xp} XP</td>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderStore() {
+      const container = document.getElementById('storeGrid');
+      container.innerHTML = '';
+      storeItems.forEach(item => {
+        const canAfford = userState.coins >= item.cost;
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-2xl p-4 border border-slate-800 flex flex-col justify-between';
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <i class="fa-solid ${item.icon} text-lg ${item.color}"></i>
+              <span class="text-xs font-bold text-amber-400">${item.cost} Monedas</span>
+            </div>
+            <h5 class="font-bold text-xs text-white">${item.name}</h5>
+            <p class="text-[11px] text-slate-400 mt-1">${item.desc}</p>
+          </div>
+          <button onclick="buyReward('${item.name}', ${item.cost})" ${!canAfford ? 'disabled' : ''} class="mt-3 py-1.5 w-full rounded-xl text-xs font-bold ${canAfford ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-600'}">
+            Canjear
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function buyReward(name, cost) {
+      if (userState.coins >= cost) {
+        userState.coins -= cost;
+        renderGamificationAll();
+        showToast('Canje Realizado', `Has obtenido: ${name}`);
+      }
+    }
+
+    function switchGamTab(tabId) {
+      document.querySelectorAll('.gam-tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.gam-tab-btn').forEach(b => b.classList.remove('bg-febres-800', 'text-white', 'border-amber-400/40'));
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('tabBtn' + tabId.replace('tab', ''));
+      if (activeBtn) activeBtn.classList.add('bg-febres-800', 'text-white', 'border-amber-400/40');
+    }
+
+    function setRole(role) {
+      userState.role = role;
+      const btnStudent = document.getElementById('btnRoleStudent');
+      const btnTeacher = document.getElementById('btnRoleTeacher');
+      const teacherBanner = document.getElementById('teacherBanner');
+
+      if (role === 'teacher') {
+        btnTeacher.className = "px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 shadow";
+        btnStudent.className = "px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white";
+        if (teacherBanner) teacherBanner.classList.remove('hidden');
+        showToast('Modo Docente', 'Panel de administración activado.');
+      } else {
+        btnStudent.className = "px-2.5 py-1 rounded-lg font-bold bg-febres-700 text-white shadow";
+        btnTeacher.className = "px-2.5 py-1 rounded-lg font-bold text-slate-400 hover:text-white";
+        if (teacherBanner) teacherBanner.classList.add('hidden');
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function handleMatricula(e) {
+      e.preventDefault();
+      document.getElementById('matriculaSuccessAlert').classList.remove('hidden');
+      showToast('Matrícula Enviada', 'Su solicitud ha sido recibida correctamente.');
+    }
+
+    function checkStatusMatricula() {
+      document.getElementById('statusResultText').innerText = "Estado: En revisión por Secretaría Institucional (Aprobación en curso).";
+    }
+
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      showToast('Consulta Enviada', 'Un tutor responderá a la brevedad posible.');
+      e.target.reset();
+    }
+
+    function handleCreateTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('inputTaskTitle').value;
+      const subject = document.getElementById('inputTaskSubject').value;
+      const diff = document.getElementById('inputTaskDiff').value;
+      const xp = parseInt(document.getElementById('inputTaskXP').value);
+      const coins = parseInt(document.getElementById('inputTaskCoins').value);
+      const desc = document.getElementById('inputTaskDesc').value;
+
+      tasks.unshift({ id: tasks.length + 1, title, subject, diff, xp, coins, desc, completed: false, icon: 'fa-graduation-cap', color: 'from-febres-700 to-slate-900' });
+      renderTasks('all');
+      closeModal('modalNewTask');
+      showToast('Tarea Publicada', `"${title}" ha sido asignada.`);
+    }
+
+    function handleGiveXP(e) {
+      e.preventDefault();
+      const studentName = document.getElementById('selectStudent').value;
+      const xp = parseInt(document.getElementById('giveXPNum').value);
+      const coins = parseInt(document.getElementById('giveCoinsNum').value);
+
+      if (studentName.includes('Mateo Silva')) {
+        userState.currentXP += xp;
+        userState.coins += coins;
+        renderGamificationAll();
+      }
+
+      closeModal('modalGiveXP');
+      showToast('Puntos Entregados', `+${xp} XP otorgados a ${studentName}.`);
+    }
+
+    function showToast(title, message) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = message;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
